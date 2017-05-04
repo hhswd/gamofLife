@@ -58,8 +58,24 @@ function control(){
           newStatus[i][j] = 0;
         }
       }
+
+
       // 绘制棋盘
       this.createGrid();
+
+      // 测试边界3子繁衍：
+      status[0][0] = 1;
+      status[0][1] = 1;
+      status[0][2] = 1;
+      status[1][2] = 1;
+      status[2][2] = 1;
+
+      this.changeCellClass(0,0);
+      this.changeCellClass(0,1);
+      this.changeCellClass(0,2);
+      this.changeCellClass(1,2);
+      this.changeCellClass(2,2);
+
     },
 
     // 创建棋盘, 格子id为i+"_"+j
@@ -94,32 +110,31 @@ function control(){
 
     // 更新棋盘(通过改变td的属性，不改变html表格结构)
     reNew: function(){
-        // 测试：
-        // 测试3子繁衍：
-        status[0][0] = 1;
-        this.changeCellClass(0,0);
-        status[0][1] = 1;
-        this.changeCellClass(0,1);
-        status[0][2] = 1;
-        this.changeCellClass(0,2);
-        // 结果预测：[0][0]熄灭，[0][1]维持点亮，[0][2]熄灭，[1][1]点亮
-        // 演变多次
-        for(var k=0;k<30;k++){
-        for(var i=0;i<row;i++){
-          for(var j=0;j<col;j++){
-            // 根据生存规则改变status的值(dead=0，live=1)
-            var isStatusChanged = this.createNewStatus(i,j);
-            // 绘制新的棋盘(通过改变td的属性)
-            if(isStatusChanged){
-              this.changeCellClass(i,j);
+        // 测试, 5秒后暂停更新
+        var end = 5000;
+  //      var changeStatus = ;
+        // 设定每次更新棋盘的时间间隔
+        var stopInterval = setInterval(
+          function(){
+            for(var i=0;i<row;i++){
+              for(var j=0;j<col;j++){
+                // 根据生存规则改变status的值(dead=0，live=1)
+                var isStatusChanged = this.createNewStatus(i,j);
+                // 绘制新的棋盘(通过改变td的属性)
+                if(isStatusChanged){
+                this.changeCellClass(i,j);
+                }
+              }
             }
-          }
-        }
-        console.log(this.getstatus());
-        console.log(this.getNewStatus());
+          }, 1000);
+
+        setTimeout(function(){clearInterval(stopInterval);}, end);
+
+        //console.log(this.getstatus());
+        //console.log(this.getNewStatus());
+
         // 更新旧状态数组
         this.coverOldStatus();
-      }
     },
 
     /**
@@ -137,7 +152,7 @@ function control(){
       var sum = this.calStatus(i-1, j-1)+this.calStatus(i-1,j)+this.calStatus(i-1,j+1)+
                 this.calStatus(i,j-1)+this.calStatus(i,j+1)+
                 this.calStatus(i+1,j-1)+this.calStatus(i+1,j)+this.calStatus(i+1,j+1);
-      // 判断新状态数组取值:
+      // 更新新状态数组:
       switch (sum) {
         case 2:
           // 维持现状
@@ -219,9 +234,6 @@ function control(){
 
 }
 
-// 遍历每个单元格：
-// 单元格i_j, 若其为dead,则判断其相邻格子是否有3个live
-// 单元格i_j, 若其为live, 则判断其
 
 
 
